@@ -19,11 +19,7 @@ import (
 // @version         1.0
 // @description     A CRUD API for the Product Service.
 func main() {
-	cfg, cfgErr := config.NewConfig()
-
-	if cfgErr != nil {
-		log.Fatal(cfgErr)
-	}
+	cfg := config.LoadEnv()
 
 	dsn := fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
 		cfg.Postgres.Host, cfg.Postgres.Port, cfg.Postgres.User, cfg.Postgres.Database, cfg.Postgres.Password)
@@ -44,5 +40,5 @@ func main() {
 
 	routers.SetupRoutes(router, db)
 
-	router.Run(":8080")
+	router.Run(":8089")
 }

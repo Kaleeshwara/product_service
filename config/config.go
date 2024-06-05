@@ -1,74 +1,52 @@
 package config
 
 import (
-	"flag"
-	"fmt"
 	"log"
 	"os"
+	"strconv"
 
-	"gopkg.in/yaml.v2"
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	Postgres struct {
-		Host     string `yaml:"host"`
-		Port     int    `yaml:"port"`
-		User     string `yaml:"user"`
-		Password string `yaml:"password"`
-		Database string `yaml:"database"`
-		Schema   string `yaml:"schema"`
-	} `yaml:"postgres"`
+		Host     string
+		Port     int
+		User     string
+		Password string
+		Database string
+		Schema   string
+	}
 }
 
-func NewConfig() (*Config, error) {
-	configPath, configPathErr := ParseFlags()
-
-	if configPathErr != nil {
-		log.Fatal(configPathErr)
-	}
-
-	config := &Config{}
-
-	file, err := os.Open(configPath)
-
+// LoadEnv function to load environment variables from .env file
+func LoadEnv() *Config {
+	err := godotenv.Load(".env")
 	if err != nil {
-		return nil, err
+		log.Fatal("Error loading .env file")
 	}
 
-	defer file.Close()
-
-	d := yaml.NewDecoder(file)
-
-	if err := d.Decode(&config); err != nil {
-		return nil, err
-	}
-
-	return config, nil
-}
-
-func ValidateConfigPath(path string) error {
-	s, err := os.Stat(path)
-
+	portStr := os.Getenv("DB_PORT")
+	port, err := strconv.Atoi(portStr)
 	if err != nil {
-		return err
+		log.Fatalf("Error converting DB_PORT to integer: %v", err)
 	}
 
-	if s.IsDir() {
-		return fmt.Errorf("'%s' is a directory, not a normal file", path)
+	return &Config{
+		Postgres: struct {
+			Host     string
+			Port     int
+			User     string
+			Password string
+			Database string
+			Schema   string
+		}{
+			Host:     os.Getenv("DB_HOST"),
+			Port:     port,
+			User:     os.Getenv("DB_USER"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Database: os.Getenv("DB_NAME"),
+			Schema:   os.Getenv("DB_SCHEMA"),
+		},
 	}
-	return nil
-}
-
-func ParseFlags() (string, error) {
-	var configPath string
-
-	flag.StringVar(&configPath, "config", "./config.yaml", "path to config file")
-
-	flag.Parse()
-
-	if err := ValidateConfigPath(configPath); err != nil {
-		return "", err
-	}
-
-	return configPath, nil
 }
