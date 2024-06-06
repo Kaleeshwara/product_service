@@ -3,23 +3,21 @@ services:
   app:
     container_name: golang_container
     environment:
-      - DB_HOST = ${DB_HOST}
-      - DB_PORT = ${DB_PORT}
-      - DB_USER = ${DB_USER}
-      - DB_PASSWORD = ${DB_PASSWORD}
-      - DB_NAME = ${DB_NAME}
-      - DB_SCHEMA = ${DB_SCHEMA}
+      - DB_HOST=postgresdb
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_NAME=product
+      - DB_SCHEMA=public
     build:
         context: .
         dockerfile: Dockerfile
     ports:
       - 8000:8080
     volumes:
-      - .:/app
+      - go_app:/app
     depends_on:
       - postgresdb
-    networks:
-      - learning
 
 
   postgresdb:
@@ -27,30 +25,14 @@ services:
     container_name: local_pgdb
     restart: always
     ports:
-      - "5431:5432"
+      - "5432:5432"
     environment:
-      POSTGRES_USER: user-name
-      POSTGRES_PASSWORD: strong-password
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=product
     volumes:
       - local_pgdata:/var/lib/postgresql/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4_container
-    restart: always
-    ports:
-      - "8880:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
-      PGADMIN_DEFAULT_PASSWORD: strong-password
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-
 volumes:
+  go_app:
   local_pgdata:
-  pgadmin-data:
-
-# Networks to be created to facilitate communication between containers
-networks:
-  learning:
-    driver: bridge

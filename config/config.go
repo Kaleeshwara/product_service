@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -32,6 +33,7 @@ func LoadEnv() *Config {
 		log.Fatalf("Error converting DB_PORT to integer: %v", err)
 	}
 
+	fmt.Println(os.Getenv("DB_HOST"), os.Getenv("DB_PASSWORD"))
 	return &Config{
 		Postgres: struct {
 			Host     string
