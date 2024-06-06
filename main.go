@@ -40,5 +40,5 @@ func main() {
 
 	routers.SetupRoutes(router, db)
 
-	router.Run(":8089")
+	router.Run(":8080")
 }
