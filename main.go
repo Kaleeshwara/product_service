@@ -6,6 +6,7 @@ import (
 
 	_ "product/docs"
 	"product/models"
+	"product/nats"
 
 	config "product/config"
 	routers "product/router"
@@ -39,6 +40,9 @@ func main() {
 	router := gin.Default()
 
 	routers.SetupRoutes(router, db)
+
+	nats.NatsInitalizeConnection(db)
+	nats.ConnectAndSubscribe()
 
 	router.Run(":8080")
 }
